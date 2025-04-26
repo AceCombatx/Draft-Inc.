@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta content="Ro-Cleaner" property="og:title" />
+<meta content="Check who's currently in Roblox condo servers in real-time, developed by Pat Runkz and Ruben Sim" property="og:description" />
+<meta content="https://rocleaner.com" property="og:url" />
+<meta content="https://rocleaner.com/roicon.png" property="og:image" />
+<meta content="#FF0000" data-react-helmet="true" name="theme-color" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">  <title>Ro-Cleaner</title>
+  <link rel="icon" href="/roicon.png" type="image/png">
+
+  <style>
+    :root {
+      --primary-color: #5865F2;
+      --primary-hover: #4752C4;
+      --bg-color: #f9f9f9;
+      --card-bg: #ffffff;
+      --text-color: #2e3338;
+      --text-muted: #747f8d;
+      --border-color: #e3e5e8;
+      --message-bg: #f2f3f5;
+      --message-hover: #e9eaec;
+      --error-color: #ED4245;
+      --success-color: #3BA55D;
+      --header-bg: #5865F2;
+      --header-text: #ffffff;
+    }
+
+    [data-theme="dark"] {
+      --primary-color: #5865F2;
+      --primary-hover: #4752C4;
+      --bg-color: #36393f;
+      --card-bg: #2f3136;
+      --text-color: #dcddde;
+      --text-muted: #96989d;
+      --border-color: #202225;
+      --message-bg: #40444b;
+      --message-hover: #454950;
+      --error-color: #ED4245;
+      --success-color: #3BA55D;
+      --header-bg: #202225;
+      --header-text: #ffffff;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+    }
+    
+    header {
+      background-color: var(--header-bg);
+      padding: 15px 20px;
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--header-text);
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .theme-toggle {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--header-text);
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 4px;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .theme-toggle:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    main {
+      flex: 1;
+      padding: 20px;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--border-color);
+    }
+    
+    h2 {
+      margin-bottom: 15px;
+      color: var(--text-color);
+      font-weight: 600;
+      font-size: 18px;
+    }
+    
+    .input-group {
+      display: flex;
+      gap: 10px;
+    }
+    
+    input {
+      flex: 1;
+      border: 1px solid var(--border-color);
+      padding: 12px 15px;
+      border-radius: 4px;
+      font-size: 16px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(88, 101, 242, 0.2);
+    }
+    
+    button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 4px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    button:hover {
+      background-color: var(--primary-hover);
+    }
+    
+    button:disabled {
+      background-color: var(--border-color);
+      cursor: not-allowed;
+    }
+    
+    .info-text {
+      margin-top: 10px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+    
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      color: var(--text-muted);
+    }
+    
+    .results-container {
+      display: none;
+    }
+    
+    .server-section {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid var(--border-color);
+    }
+    
+    .server-name {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text-color);
+    }
+    
+    .messages-container {
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+    
+    .message {
+      padding: 12px 16px;
+      background-color: var(--message-bg);
+      border-bottom: 1px solid var(--border-color);
+      position: relative;
+    }
+    
+    .message:last-child {
+      border-bottom: none;
+    }
+    
+    .message:hover {
+      background-color: var(--message-hover);
+    }
+    
+    .message-content {
+      font-size: 15px;
+      word-break: break-word;
+      margin-bottom: 4px;
+    }
+    
+    .message-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    
+    .message-time {
+      position: absolute;
+      right: 16px;
+      top: 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    
+    .no-results {
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+    
+    .error {
+      color: var(--error-color);
+      padding: 15px;
+      background-color: rgba(237, 66, 69, 0.1);
+      border-radius: 4px;
+      margin-top: 20px;
+    }
+    
+    .success {
+      color: var(--success-color);
+      padding: 15px;
+      background-color: rgba(59, 165, 93, 0.1);
+      border-radius: 4px;
+      margin-top: 20px;
+    }
+    
+    footer {
+      text-align: center;
+      padding: 15px;
+      font-size: 14px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-color);
+      margin-top: 20px;
+    }
+    
+    .pulse {
+      animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+      0% {
+        opacity: 0.6;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0.6;
+      }
+    }
+    
+    /* User profile card */
+    .user-profile {
+      display: flex;
+      align-items: center;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .user-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      margin-right: 16px;
+      background-color: var(--message-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 24px;
+      color: var(--text-color);
+      overflow: hidden;
+    }
+    
+    .user-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .user-info {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .user-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-color);
+    }
+    
+    .user-id {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    
+    /* Message styling to make it look more like Discord */
+    .discord-message-container {
+      margin-bottom: 8px;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .discord-message {
+      display: flex;
+      padding: 2px 16px 2px 72px;
+      position: relative;
+      min-height: 44px;
+    }
+    
+    .discord-message:hover {
+      background-color: var(--message-hover);
+    }
+    
+    .discord-message-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      position: absolute;
+      left: 16px;
+      background-color: var(--message-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-color);
+      font-weight: bold;
+      font-size: 16px;
+      overflow: hidden;
+    }
+    
+    .discord-message-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .discord-message-header {
+      display: flex;
+      align-items: baseline;
+      margin-bottom: 4px;
+    }
+    
+    .discord-message-author {
+      font-weight: 500;
+      margin-right: 8px;
+      color: var(--text-color);
+    }
+    
+    .discord-message-content {
+      color: var(--text-color);
+      font-size: 1rem;
+    }
+    
+    .discord-message-channel {
+      color: var(--primary-color);
+      font-size: 0.75rem;
+      margin-top: 4px;
+    }
+
+    /* Status indicators */
+    .status-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      margin-left: 10px;
+    }
+
+    .status-online {
+      background-color: var(--success-color);
+      color: white;
+    }
+
+    .status-offline {
+      background-color: var(--text-muted);
+      color: white;
+    }
+
+    
+    
+   
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .input-group {
+        flex-direction: column;
+      }
+      
+      .discord-message {
+        padding-left: 56px;
+      }
+      
+      .discord-message-avatar {
+        width: 32px;
+        height: 32px;
+        left: 12px;
+      }
+    }
+    .disclaimer-card {
+    margin-top: 20px;
+    background-color: var(--card-bg);
+    border-left: 4px solid var(--primary-color);
+  }
+  
+  .disclaimer-content {
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+  
+  .disclaimer-content p {
+    margin-bottom: 10px;
+  }
+  
+  .disclaimer-content a {
+    color: var(--primary-color);
+    text-decoration: none;
+  }
+  
+  .disclaimer-content a:hover {
+    text-decoration: underline;
+  }
+  .footer-disclaimer {
+    font-style: italic;
+  }
+
+  .patreon-support {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .patreon-link {
+    color: var(--primary-color);
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .patreon-link:hover {
+    text-decoration: underline;
+  }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      Ro-Cleaner
+    </div>
+    <button id="theme-toggle" class="theme-toggle">
+      <span id="theme-icon">🌙</span>
+      <span id="theme-text">Dark Mode</span>
+    </button>
+  </header>
+  
+  <main>
+
+    
+    <div class="card">
+      <h2>Ro-Cleaner Check</h2>
+      <form id="discord-check-form">
+        <div class="input-group">
+          <input 
+            type="text" 
+            id="discord-id" 
+            placeholder="Enter Discord User ID" 
+            required
+          >
+          <button type="submit" id="check-btn">Check User</button>
+        </div>
+      </form>
+      <p class="info-text">
+        Enter a Discord User ID to check their messages in mutual servers. IDs are 17-19 digits long.
+      </p>
+    </div>
+ 
+    <div class="loading" id="loading">
+      <div class="pulse">Fetching messages... This may take a moment.</div>
+    </div>
+    <div class="card disclaimer-card">
+        <h2>Legal Disclaimer</h2>
+        <div class="disclaimer-content">
+          <p>Ro-Cleaner is not affiliated with, endorsed by, or in any way officially connected with Discord Inc. or any of its subsidiaries or affiliates.</p>
+          <p>The official Discord website can be found at <a href="https://discord.com" target="_blank" rel="noopener noreferrer">https://discord.com</a>.</p>
+          <p>All product and company names are trademarks™ or registered® trademarks of their respective holders. Use of them does not imply any affiliation with or endorsement by them.</p>
+          <p>This tool is for informational purposes only. Users are responsible for ensuring their use complies with Discord's Terms of Service and Community Guidelines.</p>
+          <p>By using this tool, you agree that the creators and operators of Ro-Cleaner shall not be liable for any damages or losses arising from your use of this tool.</p>
+        </div>
+      </div>
+    <div class="results-container" id="results">
+      <div class="card" id="messages-card">
+        <div id="user-profile-container"></div>
+        <h2>Messages</h2>
+        <div id="messages-container"></div>
+      </div>
+    </div>
+  </main>
+  
+  <footer>
+    <div class="patreon-support">
+      <span>Join my patreon and keep the site running:</span>
+      <a href="https://patreon.com/PatRunkz" target="_blank" class="patreon-link">Join 💲</a>
+    </div>
+    <div class="credits" style="margin-top: 10px; font-size: 14px;">
+      <span>Made by <a href="https://x.com/realRubenSim" target="_blank" style="color: red; text-decoration: none;">Ruben Sim</a> and <a href="https://x.com/PatRunkz" target="_blank" style="color: #fe9d8e; text-decoration: none;">Pat Runkz</a></span>
+    </div>
+    <span class="footer-disclaimer">Not affiliated with Discord Inc.</span>
+
+  </footer>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('discord-check-form');
+      const discordIdInput = document.getElementById('discord-id');
+      const checkBtn = document.getElementById('check-btn');
+      const loading = document.getElementById('loading');
+      const results = document.getElementById('results');
+      const messagesContainer = document.getElementById('messages-container');
+      const userProfileContainer = document.getElementById('user-profile-container');
+      const themeToggle = document.getElementById('theme-toggle');
+      const themeIcon = document.getElementById('theme-icon');
+      const themeText = document.getElementById('theme-text');
+      
+    // Theme switching functionality
+    function setTheme(themeName) {
+      try {
+        localStorage.setItem('theme', themeName);
+      } catch (e) {
+        console.warn('Unable to save theme preference:', e);
+        // Continue even if localStorage fails
+      }
+      document.documentElement.setAttribute('data-theme', themeName);
+      
+      if (themeName === 'dark') {
+        themeIcon.textContent = '☀️';
+        themeText.textContent = 'Light Mode';
+      } else {
+        themeIcon.textContent = '🌙';
+        themeText.textContent = 'Dark Mode';
+      }
+    }
+
+    // Check for saved theme preference or respect OS preference
+    let initialTheme = 'light';
+    try {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+        initialTheme = savedTheme;
+      } else {
+        // Check if user prefers dark mode
+        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (prefersDarkScheme) {
+          initialTheme = 'dark';
+        }
+      }
+    } catch (e) {
+      console.warn('Unable to access theme preference:', e);
+      // Check if user prefers dark mode as fallback
+      const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (prefersDarkScheme) {
+        initialTheme = 'dark';
+      }
+    }
+
+    // Set initial theme
+    setTheme(initialTheme);
+      
+      // Theme toggle button
+      themeToggle.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        if (currentTheme === 'dark') {
+          setTheme('light');
+        } else {
+          setTheme('dark');
+        }
+      });
+      
+      // Generate random color from username
+      function stringToColor(string) {
+        let hash = 0;
+        for (let i = 0; i < string.length; i++) {
+          hash = string.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        let color = '#';
+        for (let i = 0; i < 3; i++) {
+          const value = (hash >> (i * 8)) & 0xFF;
+          color += ('00' + value.toString(16)).substr(-2);
+        }
+        return color;
+      }
+      
+      // Generate initials from a string
+      function getInitials(string) {
+        if (!string) return 'U';
+        return string
+          .split(' ')
+          .map(word => word[0])
+          .join('')
+          .substring(0, 2)
+          .toUpperCase();
+      }
+      
+      // Sanitize user input
+      function sanitizeHtml(text) {
+        return text
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+      
+      // Display user profile
+      function displayUserProfile(userInfo, discordId) {
+        userProfileContainer.innerHTML = '';
+        
+        const profileDiv = document.createElement('div');
+        profileDiv.className = 'user-profile';
+        
+        const avatarDiv = document.createElement('div');
+        avatarDiv.className = 'user-avatar';
+        
+        // If we have avatar URL, use it. Otherwise use initials
+        if (userInfo && userInfo.avatarURL) {
+          const avatarImg = document.createElement('img');
+          avatarImg.src = userInfo.avatarURL;
+          avatarImg.alt = 'User Avatar';
+          avatarDiv.appendChild(avatarImg);
+        } else {
+          const initials = userInfo && userInfo.username ? 
+            getInitials(userInfo.username) : 'U';
+          avatarDiv.textContent = initials;
+          avatarDiv.style.backgroundColor = stringToColor(discordId);
+        }
+        
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'user-info';
+        
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'user-name';
+        nameDiv.textContent = userInfo && userInfo.username ? 
+          userInfo.username : 'Unknown User';
+        
+        const idDiv = document.createElement('div');
+        idDiv.className = 'user-id';
+        idDiv.textContent = `ID: ${discordId}`;
+        
+       
+        infoDiv.appendChild(nameDiv);
+        infoDiv.appendChild(idDiv);
+        
+        profileDiv.appendChild(avatarDiv);
+        profileDiv.appendChild(infoDiv);
+        
+        userProfileContainer.appendChild(profileDiv);
+      }
+      
+      // Format messages in Discord style
+      function formatDiscordMessages(serverData, userInfo, userId) {
+        if (!serverData || typeof serverData !== 'object') return null;
+        
+        const { serverName, messages } = serverData;
+        
+        const serverSection = document.createElement('div');
+        serverSection.className = 'server-section';
+        
+        const serverNameEl = document.createElement('div');
+        serverNameEl.className = 'server-name';
+        serverNameEl.textContent = serverName || 'Unknown Server';
+        serverSection.appendChild(serverNameEl);
+        
+        const messagesWrapper = document.createElement('div');
+        messagesWrapper.className = 'discord-messages-wrapper';
+        
+        if (!messages || !Array.isArray(messages) || messages.length === 0) {
+          const noMessagesEl = document.createElement('div');
+          noMessagesEl.className = 'no-results';
+          noMessagesEl.textContent = 'No messages found in this server.';
+          messagesWrapper.appendChild(noMessagesEl);
+        } else {
+          messages.forEach(message => {
+            if (!message || !message.content) return;
+            
+            const messageContainer = document.createElement('div');
+            messageContainer.className = 'discord-message-container';
+            
+            const messageEl = document.createElement('div');
+            messageEl.className = 'discord-message';
+            
+            // Create avatar
+            const avatarEl = document.createElement('div');
+            avatarEl.className = 'discord-message-avatar';
+            
+            if (userInfo && userInfo.avatarURL) {
+              const avatarImg = document.createElement('img');
+              avatarImg.src = userInfo.avatarURL;
+              avatarImg.alt = 'User Avatar';
+              avatarEl.appendChild(avatarImg);
+            } else {
+              avatarEl.textContent = userInfo && userInfo.username ? 
+                getInitials(userInfo.username) : 'U';
+              avatarEl.style.backgroundColor = stringToColor(userId);
+            }
+            
+            messageEl.appendChild(avatarEl);
+            
+            const messageContentWrapper = document.createElement('div');
+            messageContentWrapper.className = 'discord-message-content-wrapper';
+            
+            const messageHeader = document.createElement('div');
+            messageHeader.className = 'discord-message-header';
+            
+            const authorEl = document.createElement('span');
+            authorEl.className = 'discord-message-author';
+            authorEl.textContent = userInfo && userInfo.username ? 
+              userInfo.username : 'User ' + userId.substring(0, 4);
+            
+            messageHeader.appendChild(authorEl);
+            
+            const contentEl = document.createElement('div');
+            contentEl.className = 'discord-message-content';
+            contentEl.textContent = message.content;
+            
+            const channelEl = document.createElement('div');
+            channelEl.className = 'discord-message-channel';
+            channelEl.textContent = `#${message.channelId || 'unknown-channel'}`;
+            
+            messageContentWrapper.appendChild(messageHeader);
+            messageContentWrapper.appendChild(contentEl);
+            messageContentWrapper.appendChild(channelEl);
+            
+            messageEl.appendChild(messageContentWrapper);
+            messageContainer.appendChild(messageEl);
+            
+            messagesWrapper.appendChild(messageContainer);
+          });
+        }
+        
+        serverSection.appendChild(messagesWrapper);
+        return serverSection;
+      }
+      
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const discordId = sanitizeHtml(discordIdInput.value.trim());
+        
+        // Basic validation
+        if (!discordId) {
+          alert('Please enter a Discord ID');
+          return;
+        }
+        
+        if (!/^\d+$/.test(discordId)) {
+          alert('Discord ID must contain only numbers');
+          return;
+        }
+        
+        if (discordId.length < 17 || discordId.length > 19) {
+          alert('Discord ID must be between 17-19 digits');
+          return;
+        }
+        
+        // Reset and show loading
+        messagesContainer.innerHTML = '';
+        userProfileContainer.innerHTML = '';
+        results.style.display = 'none';
+        loading.style.display = 'block';
+        checkBtn.disabled = true;
+        
+        try {
+          const response = await fetch('/api/check-discord', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ discordId })
+          });
+          
+          const data = await response.json();
+          
+          if (!response.ok) {
+            throw new Error(data.error || 'Failed to check Discord data');
+          }
+          
+          // Display user profile if available
+          if (data.userInfo) {
+            displayUserProfile(data.userInfo, discordId);
+          } else {
+            displayUserProfile(null, discordId);
+          }
+          
+          // Display messages
+          if (typeof data.messages === 'string') {
+            // Single message (likely an error or info message)
+            const messageDiv = document.createElement('div');
+            messageDiv.className = data.success ? 'success' : 'error';
+            messageDiv.textContent = data.messages;
+            messagesContainer.appendChild(messageDiv);
+          } else if (Array.isArray(data.messages)) {
+            // Process each guild's messages
+            if (data.messages.length === 0) {
+              const noResultsDiv = document.createElement('div');
+              noResultsDiv.className = 'no-results';
+              noResultsDiv.textContent = 'No messages found for this user.';
+              messagesContainer.appendChild(noResultsDiv);
+            } else {
+              data.messages.forEach(guildMessages => {
+                if (!guildMessages) return;
+                
+                const formattedMessages = formatDiscordMessages(guildMessages, data.userInfo, discordId);
+                if (formattedMessages) {
+                  messagesContainer.appendChild(formattedMessages);
+                }
+              });
+            }
+          }
+          
+          results.style.display = 'block';
+          
+        } catch (error) {
+          console.error('Error:', error);
+          messagesContainer.innerHTML = `
+            <div class="error">
+              ${error.message || 'An error occurred while checking Discord data'}
+            </div>
+          `;
+          results.style.display = 'block';
+        } finally {
+          loading.style.display = 'none';
+          checkBtn.disabled = false;
+        }
+      });
+    });
+  </script>
+</body>
+</html>
